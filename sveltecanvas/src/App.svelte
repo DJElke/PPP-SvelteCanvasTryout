@@ -1,12 +1,9 @@
 <script>
 	import { onMount } from 'svelte'
 
-	let width = window.innerWidth;
-	let height = window.innerHeight;
-
-	let canvas, context, img;
-
-	let fillColor = "#ffffff";
+	let width = 960;
+	let height = 640;
+	let canvas, context, img, imageData, showImage;
 
 	onMount(() => {
 		img = new Image();
@@ -19,22 +16,12 @@
 			context.drawImage(img, 0,0);
 		});
 
-		context.fillCircle = (x,y,radius, fillColor) => {
-			context.fillStyle = fillColor;
+		context.fillCircle = (x,y,radius) => {
             context.beginPath();
             context.moveTo(x, y);
             context.arc(x, y, radius, 0, Math.PI * 2, false);
             context.fill();
-		}
-
-		// context.clearTo = (fillColor) => {
-		// 	context.fillStyle = fillColor;
-        //     context.fillRect(0, 0, width, height);
-		// }
-
-		// context.clearTo(fillColor || "#ffffff");
-
-		
+		}		
 	});
 
 	const mouseDown = () => {
@@ -54,13 +41,31 @@
 		let x = e.pageX - canvas.offsetLeft;
 		let y = e.pageY - canvas.offsetTop;
 		let radius = 10;
-		fillColor = '#ff0000';
 		context.globalCompositeOperation = 'destination-out';
-		context.fillCircle(x,y,radius, fillColor);
+		context.fillCircle(x,y,radius);
 	}
+
+	const showDrawing = () => {
+		imageData = canvas.toDataURL('image/png');
+		showImage = document.querySelector('.drawing');
+		showImage.classList.remove('display-none');
+		showImage.src = imageData;
+	};
 </script>
 
 <main>
 	<canvas on:mousedown={mouseDown} on:mouseup={mouseUp} on:mousemove={erase} class="canvas" width={width} height={height}></canvas>
+	<button on:click={showDrawing}>save drawing</button>
+	<img class="drawing display-none" alt="drawing"/>
 </main>
+
+<style>
+	.display-none{
+		display: none;
+	}
+
+	canvas{
+		background: transparent;
+	}
+</style>
 
